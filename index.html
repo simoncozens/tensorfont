@@ -1,0 +1,298 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Tensorfont - Turn font glyphs into numpy arrays &#8212; tensorfont  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="tensorfont-turn-font-glyphs-into-numpy-arrays">
+<h1>Tensorfont - Turn font glyphs into numpy arrays<a class="headerlink" href="#tensorfont-turn-font-glyphs-into-numpy-arrays" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<span class="target" id="module-tensorfont"></span><dl class="class">
+<dt id="tensorfont.Font">
+<em class="property">class </em><code class="descclassname">tensorfont.</code><code class="descname">Font</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font" title="Permalink to this definition">¶</a></dt>
+<dd><p>The <cite>Font</cite> module is your entry point for using Tensorfont.
+Use this to load up a font and begin exploring it.</p>
+<dl class="attribute">
+<dt id="tensorfont.Font.ascender">
+<code class="descname">ascender</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Font.ascender" title="Permalink to this definition">¶</a></dt>
+<dd><p>The font’s ascender height, in font units.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tensorfont.Font.descender">
+<code class="descname">descender</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Font.descender" title="Permalink to this definition">¶</a></dt>
+<dd><p>The font’s descender height, in font units (usually negative).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tensorfont.Font.full_height">
+<code class="descname">full_height</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Font.full_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>The font’s full (descender + ascender) height.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tensorfont.Font.baseline_ratio">
+<code class="descname">baseline_ratio</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Font.baseline_ratio" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ascender-to-descender ratio.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.Font.glyph">
+<code class="descname">glyph</code><span class="sig-paren">(</span><em>g</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font.glyph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Access a glyph by name. Returns a <cite>Glyph</cite> object.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tensorfont.Font.m_width">
+<code class="descname">m_width</code><a class="headerlink" href="#tensorfont.Font.m_width" title="Permalink to this definition">¶</a></dt>
+<dd><p>The width of the ‘m’ glyph, in font units.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tensorfont.Font.x_height">
+<code class="descname">x_height</code><a class="headerlink" href="#tensorfont.Font.x_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>The height of the ‘x’ glyph, in font units.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.Font.pair_kerning">
+<code class="descname">pair_kerning</code><span class="sig-paren">(</span><em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font.pair_kerning" title="Permalink to this definition">¶</a></dt>
+<dd><p>The kerning between two glyphs (specified by name), in font units.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.Font.pair_distance">
+<code class="descname">pair_distance</code><span class="sig-paren">(</span><em>left</em>, <em>right</em>, <em>with_kerning=True</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font.pair_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>The ink distance between two named glyphs, in font units.
+This is formed by adding the right sidebearing of the left glyph to the left sidebearing
+of the right glyph, plus a kerning correction. To turn off kerning, use <cite>with_kerning=False</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.Font.minimum_ink_distance">
+<code class="descname">minimum_ink_distance</code><span class="sig-paren">(</span><em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font.minimum_ink_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>The distance between the ink of the left glyph and the ink of the right glyph, when
+sidebearings are discarded. For many pairs, this will be zero, as the shapes bump up against
+each other (consider “nn” and “oo”). However, pairs like “VA” and “xT” will have a large
+minimum ink distance.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tensorfont.Glyph">
+<em class="property">class </em><code class="descclassname">tensorfont.</code><code class="descname">Glyph</code><span class="sig-paren">(</span><em>font</em>, <em>g</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Glyph" title="Permalink to this definition">¶</a></dt>
+<dd><p>A representation of a glyph and its metrics.</p>
+<dl class="attribute">
+<dt id="tensorfont.Glyph.name">
+<code class="descname">name</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Glyph.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the glyph.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tensorfont.Glyph.width">
+<code class="descname">width</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Glyph.width" title="Permalink to this definition">¶</a></dt>
+<dd><p>The width of the glyph in font units (including sidebearings).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tensorfont.Glyph.height">
+<code class="descname">height</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Glyph.height" title="Permalink to this definition">¶</a></dt>
+<dd><p>The height of the glyph in font units.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tensorfont.Glyph.lsb">
+<code class="descname">lsb</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Glyph.lsb" title="Permalink to this definition">¶</a></dt>
+<dd><p>The left sidebearing in font units.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tensorfont.Glyph.rsb">
+<code class="descname">rsb</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Glyph.rsb" title="Permalink to this definition">¶</a></dt>
+<dd><p>The right sidebearing in font units.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tensorfont.Glyph.tsb">
+<code class="descname">tsb</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Glyph.tsb" title="Permalink to this definition">¶</a></dt>
+<dd><p>The top sidebearing (distance from ascender to ink top) in font units.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tensorfont.Glyph.as_matrix">
+<code class="descname">as_matrix</code><a class="headerlink" href="#tensorfont.Glyph.as_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renders the glyph as a matrix. By default, the matrix values are integer pixel greyscale values
+in the range 0 to 255, but they can be normalized or turned into binary values with the
+appropriate keyword arguments. The matrix is returned as a <cite>GlyphRendering</cite> object which
+can be further manipulated.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tensorfont.GlyphRendering">
+<em class="property">class </em><code class="descclassname">tensorfont.</code><code class="descname">GlyphRendering</code><a class="headerlink" href="#tensorfont.GlyphRendering" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="classmethod">
+<dt id="tensorfont.GlyphRendering.init_from_numpy">
+<em class="property">classmethod </em><code class="descname">init_from_numpy</code><span class="sig-paren">(</span><em>glyph</em>, <em>matrix</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.init_from_numpy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.with_padding">
+<code class="descname">with_padding</code><span class="sig-paren">(</span><em>left_padding</em>, <em>right_padding</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.with_padding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new <cite>GlyphRendering</cite> object, left and right zero-padding to the glyph image.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.with_sidebearings">
+<code class="descname">with_sidebearings</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.with_sidebearings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new <cite>GlyphRendering</cite> object, extending the image to add the
+glyph’s sidebearings. If the sidebearings are negative, the matrix
+will be trimmed appropriately.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.mask_to_x_height">
+<code class="descname">mask_to_x_height</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.mask_to_x_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new <cite>GlyphRendering</cite> object, cropping the glyph image
+from the baseline to the x-height. (Assuming that the input <cite>GlyphRendering</cite> is full height.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.crop_descender">
+<code class="descname">crop_descender</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.crop_descender" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new <cite>GlyphRendering</cite> object, cropping the glyph image
+from the baseline to the ascender. (Assuming that the input <cite>GlyphRendering</cite> is full height.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.scale_to_height">
+<code class="descname">scale_to_height</code><span class="sig-paren">(</span><em>height</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.scale_to_height" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new <cite>GlyphRendering</cite> object, scaling the glyph image to the
+given height. (The new width is calculated proportionally.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.left_contour">
+<code class="descname">left_contour</code><span class="sig-paren">(</span><em>cutoff=30</em>, <em>max_depth=10000</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.left_contour" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the left contour of the matrix; ie, the ‘sidebearing array’ from the
+edge of the matrix to the leftmost ink pixel. If no ink is found at a given
+scanline, the value of max_depth is used instead.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.right_contour">
+<code class="descname">right_contour</code><span class="sig-paren">(</span><em>cutoff=30</em>, <em>max_depth=10000</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.right_contour" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the right contour of the matrix; ie, the ‘sidebearing array’ from the
+edge of the matrix to the rightmost ink pixel. If no ink is found at a given
+scanline, the value of max_depth is used instead.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">tensorfont</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, Simon Cozens.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
