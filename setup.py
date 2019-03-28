@@ -10,8 +10,8 @@ config = {
     'description': 'Turn font glyphs into numpy arrays',
     'long_description': open('README.rst', 'r').read(),
     'license': 'MIT',
-    'version': '0.0.1',
-    'install_requires': ["skimage", "numpy", "freetype-py"],
+    'version': '0.0.2',
+    'install_requires': ["scikit-image", "numpy", "freetype-py"],
     'classifiers': [
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
