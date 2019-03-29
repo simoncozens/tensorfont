@@ -11,7 +11,7 @@ config = {
     'long_description': open('README.rst', 'r').read(),
     'license': 'MIT',
     'version': '0.0.2',
-    'install_requires': ["scikit-image", "numpy", "freetype-py"],
+    'install_requires': ["scikit-image", "numpy", "freetype-py", "scipy"],
     'classifiers': [
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",

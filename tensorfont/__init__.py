@@ -5,6 +5,7 @@ import freetype
 
 from skimage.transform import resize
 from skimage.util import pad
+import scipy
 
 from tensorfont.getKerningPairsFromOTF import OTFKernReader
 from functools import lru_cache
@@ -216,3 +217,25 @@ class GlyphRendering(np.ndarray):
     pixels = np.fliplr(self)
     contour = np.argmax(pixels > cutoff, axis=1) + max_depth * (np.max(pixels, axis=1) <= cutoff)
     return np.array(contour)
+
+  def apply_flexible_distance_kernel(self, power):
+    """Transforms the matrix by applying a flexible distance kernel, raised to the given power."""
+    matrix = self / np.max(self) # Normalize if not done already
+    f_edt = matrix ** power
+    [fy, fx] = np.indices(matrix.shape)
+    kernel_fy = fy - matrix.shape[0]/2 + 0.5
+    kernel_fx = fx - matrix.shape[1]/2 + 0.5
+    flexible_distance_kernel = np.maximum( (kernel_fy ** 2 + kernel_fx ** 2)**0.5, 1.) ** -power
+    convolved = scipy.signal.convolve(f_edt, flexible_distance_kernel, mode='same') ** (-1/power)
+    clipped = np.clip(convolved, 1e-22,200)
+    return (1. / clipped + 1.e-11) - clipped
+
+  def impose(self, other, distance=0):
+    """Returns a new `GlyphRendering` object made up of two `GlyphRendering`s
+    placed side by side at the given distance."""
+    if self.shape[0] != other.shape[0]:
+      raise ValueError("heights don't match in impose")
+    extension = distance + other.shape[1]
+    extended = self.with_padding(0,extension)
+    extended[:,self.shape[1]+distance:self.shape[1]+extension] += other
+    return extended
