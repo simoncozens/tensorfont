@@ -231,7 +231,7 @@ class GlyphRendering(np.ndarray):
     return (1. / clipped + 1.e-11) - clipped
 
   def impose(self, other, distance=0):
-    """Returns a new `GlyphRendering` object made up of two `GlyphRendering`s
+    """Returns a new `GlyphRendering` object made up of two `GlyphRendering` objects
     placed side by side at the given distance."""
     if self.shape[0] != other.shape[0]:
       raise ValueError("heights don't match in impose")
