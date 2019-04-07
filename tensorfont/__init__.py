@@ -5,6 +5,9 @@ import freetype
 
 from skimage.transform import resize
 from skimage.util import pad
+from skimage import filters
+
+from scipy import ndimage
 import scipy
 
 from tensorfont.getKerningPairsFromOTF import OTFKernReader
@@ -201,7 +204,7 @@ class GlyphRendering(np.ndarray):
     """Returns a new `GlyphRendering` object, scaling the glyph image to the
     given height. (The new width is calculated proportionally.)"""
     new_width = int(self.shape[1] * height / self.shape[0])
-    return GlyphRendering.init_from_numpy(self._glyph, resize(self, (height, new_width)))
+    return GlyphRendering.init_from_numpy(self._glyph, resize(self, (height, new_width), mode="constant",anti_aliasing = True))
 
   def left_contour(self, cutoff = 30, max_depth = 10000):
     """Returns the left contour of the matrix; ie, the 'sidebearing array' from the
@@ -218,17 +221,14 @@ class GlyphRendering(np.ndarray):
     contour = np.argmax(pixels > cutoff, axis=1) + max_depth * (np.max(pixels, axis=1) <= cutoff)
     return np.array(contour)
 
-  def apply_flexible_distance_kernel(self, power):
-    """Transforms the matrix by applying a flexible distance kernel, raised to the given power."""
-    matrix = self / np.max(self) # Normalize if not done already
-    f_edt = matrix ** power
-    [fy, fx] = np.indices(matrix.shape)
-    kernel_fy = fy - matrix.shape[0]/2 + 0.5
-    kernel_fx = fx - matrix.shape[1]/2 + 0.5
-    flexible_distance_kernel = np.maximum( (kernel_fy ** 2 + kernel_fx ** 2)**0.5, 1.) ** -power
-    convolved = scipy.signal.convolve(f_edt, flexible_distance_kernel, mode='same') ** (-1/power)
-    clipped = np.clip(convolved, 1e-22,200)
-    return (1. / clipped + 1.e-11) - clipped
+  def apply_flexible_distance_kernel(self, strength):
+    """Transforms the matrix by applying a flexible distance kernel, with given strength."""
+    transformed = np.clip(strength-ndimage.distance_transform_edt(np.logical_not(self)),0,strength)/strength
+    return GlyphRendering.init_from_numpy(self._glyph,transformed)
+
+  def gradients(self):
+    """Returns a pair of images representing the horizontal and vertical gradients."""
+    return filters.sobel_h(self), filters.sobel_v(self)
 
   def impose(self, other, distance=0):
     """Returns a new `GlyphRendering` object made up of two `GlyphRendering` objects
@@ -239,3 +239,8 @@ class GlyphRendering(np.ndarray):
     extended = self.with_padding(0,extension)
     extended[:,self.shape[1]+distance:self.shape[1]+extension] += other
     return extended
+
+  def set_at_distance(self,other,distance=0):
+    """Similar to `impose` but returns a pair of `GlyphRendering` objects separately, padded at the correct distance."""
+    s2, o2 = self.with_padding(0, other.shape[1] + distance//2), other.with_padding(self.shape[1]+distance//2, 0)
+    return s2, o2
