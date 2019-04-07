@@ -204,7 +204,7 @@ class GlyphRendering(np.ndarray):
     """Returns a new `GlyphRendering` object, scaling the glyph image to the
     given height. (The new width is calculated proportionally.)"""
     new_width = int(self.shape[1] * height / self.shape[0])
-    return GlyphRendering.init_from_numpy(self._glyph, resize(self, (height, new_width), mode="constant",anti_aliasing = True))
+    return GlyphRendering.init_from_numpy(self._glyph, resize(self, (height, new_width), mode="constant"))
 
   def left_contour(self, cutoff = 30, max_depth = 10000):
     """Returns the left contour of the matrix; ie, the 'sidebearing array' from the
