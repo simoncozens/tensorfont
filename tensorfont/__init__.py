@@ -109,9 +109,7 @@ class Glyph(object):
     self.name = g
     """The name of the glyph."""
 
-    n = self.face.get_name_index(g.encode("utf8"))
-    self.face.load_glyph(n, freetype.FT_LOAD_RENDER |
-                              freetype.FT_LOAD_TARGET_MONO)
+    self.face.load_char(g)
     slot = self.face.glyph
     self.ink_width = slot.bitmap.width
     self.ink_height= slot.bitmap.rows
