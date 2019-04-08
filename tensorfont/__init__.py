@@ -240,5 +240,5 @@ class GlyphRendering(np.ndarray):
 
   def set_at_distance(self,other,distance=0):
     """Similar to `impose` but returns a pair of `GlyphRendering` objects separately, padded at the correct distance."""
-    s2, o2 = self.with_padding(0, other.shape[1] + distance//2), other.with_padding(self.shape[1]+distance//2, 0)
+    s2, o2 = self.with_padding(0, other.shape[1] + distance), other.with_padding(self.shape[1]+distance, 0)
     return s2, o2
