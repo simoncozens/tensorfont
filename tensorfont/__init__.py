@@ -55,7 +55,7 @@ class Font(object):
     """The ascender-to-descender ratio."""
 
     self.glyphcache = {}
-    self.kernreader = OTFKernReader(filename)
+    self.kernreader = None
 
   def glyph(self,g):
     """Access a glyph by name. Returns a `Glyph` object."""
@@ -78,6 +78,8 @@ class Font(object):
     if self.face.has_kerning:
       return self.face.get_kerning(left, right).x >> 6
     else:
+      if not self.kernreader:
+         self.kernreader = OTFKernReader(filename)
       if (left,right) in self.kernreader.kerningPairs:
         return self.kernreader.kerningPairs[(left,right)]
       return 0
