@@ -39,6 +39,7 @@ class Font(object):
   """
 
   def __init__(self, filename):
+    self.filename = filename
     self.face = freetype.Face(filename)
     self.face.set_char_size( 64 * self.face.units_per_EM )
 
@@ -79,7 +80,7 @@ class Font(object):
       return self.face.get_kerning(left, right).x >> 6
     else:
       if not self.kernreader:
-         self.kernreader = OTFKernReader(filename)
+         self.kernreader = OTFKernReader(self.filename)
       if (left,right) in self.kernreader.kerningPairs:
         return self.kernreader.kerningPairs[(left,right)]
       return 0
