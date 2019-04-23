@@ -90,12 +90,12 @@ class Font(object):
   def pair_kerning(self, left, right):
     """The kerning between two glyphs (specified by name), in font units."""
     if self.face.has_kerning:
-      return self.face.get_kerning(left, right).x >> 6
+      return (self.face.get_kerning(left, right).x >> 6) * self.scale_factor
     else:
       if not self.kernreader:
          self.kernreader = OTFKernReader(self.filename)
       if (left,right) in self.kernreader.kerningPairs:
-        return self.kernreader.kerningPairs[(left,right)]
+        return self.kernreader.kerningPairs[(left,right)] * self.scale_factor
       return 0
 
   def pair_distance(self, left, right, with_kerning=True):
