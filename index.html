@@ -38,25 +38,25 @@
 </div>
 <span class="target" id="module-tensorfont"></span><dl class="class">
 <dt id="tensorfont.Font">
-<em class="property">class </em><code class="descclassname">tensorfont.</code><code class="descname">Font</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">tensorfont.</code><code class="descname">Font</code><span class="sig-paren">(</span><em>filename</em>, <em>x_height_in_px</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <cite>Font</cite> module is your entry point for using Tensorfont.
 Use this to load up a font and begin exploring it.</p>
 <dl class="attribute">
-<dt id="tensorfont.Font.ascender">
-<code class="descname">ascender</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Font.ascender" title="Permalink to this definition">¶</a></dt>
-<dd><p>The font’s ascender height, in font units.</p>
+<dt id="tensorfont.Font.ascender_px">
+<code class="descname">ascender_px</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Font.ascender_px" title="Permalink to this definition">¶</a></dt>
+<dd><p>The font’s ascender height, in font units and pixels.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="tensorfont.Font.descender">
-<code class="descname">descender</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Font.descender" title="Permalink to this definition">¶</a></dt>
-<dd><p>The font’s descender height, in font units (usually negative).</p>
+<dt id="tensorfont.Font.descender_px">
+<code class="descname">descender_px</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Font.descender_px" title="Permalink to this definition">¶</a></dt>
+<dd><p>The font’s descender height, in font units and pixels (usually negative).</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="tensorfont.Font.full_height">
-<code class="descname">full_height</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Font.full_height" title="Permalink to this definition">¶</a></dt>
-<dd><p>The font’s full (descender + ascender) height.</p>
+<dt id="tensorfont.Font.full_height_px">
+<code class="descname">full_height_px</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Font.full_height_px" title="Permalink to this definition">¶</a></dt>
+<dd><p>The font’s full (descender + ascender) height, in font units and pixels.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -64,6 +64,11 @@ Use this to load up a font and begin exploring it.</p>
 <code class="descname">baseline_ratio</code><em class="property"> = None</em><a class="headerlink" href="#tensorfont.Font.baseline_ratio" title="Permalink to this definition">¶</a></dt>
 <dd><p>The ascender-to-descender ratio.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.Font.get_xheight">
+<code class="descname">get_xheight</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font.get_xheight" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="tensorfont.Font.glyph">
@@ -100,7 +105,7 @@ of the right glyph, plus a kerning correction. To turn off kerning, use <cite>wi
 <dl class="method">
 <dt id="tensorfont.Font.minimum_ink_distance">
 <code class="descname">minimum_ink_distance</code><span class="sig-paren">(</span><em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font.minimum_ink_distance" title="Permalink to this definition">¶</a></dt>
-<dd><p>The distance between the ink of the left glyph and the ink of the right glyph, when
+<dd><p>The distance, in pixels, between the ink of the left glyph and the ink of the right glyph, when
 sidebearings are discarded. For many pairs, this will be zero, as the shapes bump up against
 each other (consider “nn” and “oo”). However, pairs like “VA” and “xT” will have a large
 minimum ink distance.</p>
@@ -172,6 +177,11 @@ can be further manipulated.</p>
 <code class="descname">with_padding</code><span class="sig-paren">(</span><em>left_padding</em>, <em>right_padding</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.with_padding" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a new <cite>GlyphRendering</cite> object, left and right zero-padding to the glyph image.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.with_padding_to_constant_box_width">
+<code class="descname">with_padding_to_constant_box_width</code><span class="sig-paren">(</span><em>box_width</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.with_padding_to_constant_box_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="tensorfont.GlyphRendering.with_sidebearings">
