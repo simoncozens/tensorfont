@@ -12,6 +12,7 @@ import scipy
 
 from tensorfont.getKerningPairsFromOTF import OTFKernReader
 from functools import lru_cache
+from itertools import tee
 
 safe_glyphs = set([
   "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
@@ -115,6 +116,30 @@ class Font(object):
     right_of_l = self.glyph(left).as_matrix().right_contour()
     left_of_r  = self.glyph(right).as_matrix().left_contour()
     return np.min(right_of_l + left_of_r)
+
+  def set_string(self, s, pair_distance_dict = {}):
+    """Returns a matrix containing a representation of the given string. If a dictionary
+    is passed to `pair_distance_dict`, then each pair name `(l,r)` will be looked up
+    in the directionary and the result will be used as a distance *in pixel units* at
+    which to set the pair. If no entry is found or no dictionary is passed, then the font
+    will be queried for the appropriate distance.
+
+    Hint: If you want to use glyph names which are not single characters, then pass an
+    *array* of glyph names instead of a string."""
+    def pairwise(iterable):
+      a, b = tee(iterable)
+      next(b, None)
+      return zip(a, b)
+    image = self.glyph(s[0]).as_matrix()
+    for l,r in pairwise(s):
+      newimage = self.glyph(r).as_matrix()
+      if (l,r) in pair_distance_dict:
+        dist = pair_distance_dict[(l,r)]
+      else:
+        dist = self.pair_distance(l,r)
+      image = image.impose(newimage,int(dist))
+    return image
+
 
 class Glyph(object):
   """A representation of a glyph and its metrics."""
