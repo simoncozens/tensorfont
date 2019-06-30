@@ -295,7 +295,6 @@ class GlyphRendering(np.ndarray):
     and zero values elsewhere, and the second has positive values between the right-hand contour and
     the right edge of the matrix and zero values elsewhere. In other words this gives you the
     "white" at the edge of the glyph, without any interior counters."""
-    right
     def last_nonzero(arr, axis, invalid_val=-1):
         mask = arr > 5/255.0
         val = arr.shape[axis] - np.flip(mask, axis=axis).argmax(axis=axis) - 1
