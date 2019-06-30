@@ -117,6 +117,24 @@ class Font(object):
     left_of_r  = self.glyph(right).as_matrix().left_contour()
     return np.min(right_of_l + left_of_r)
 
+  def shift_distances(self,l,r,dist):
+    """Returns two distances, for which the left glyph matrix and the right glyph matrix
+    should be translated such that, when the translations are done, the pair is set at a
+    distance `dist` pixels apart.
+
+    (Inputs `l` and `r` are glyph names, not `GlyphRendering` objects.)
+    """
+    sample_distance = dist + f.minimum_ink_distance(l,r)
+    sample_distance_left = np.ceil(sample_distance / 2)
+    sample_distance_right = np.floor(sample_distance / 2)
+    total_ink_width = f.glyph(l).ink_width + f.glyph(r).ink_width
+    ink_width_left = np.floor(total_ink_width / 4)
+    ink_width_right = np.ceil(total_ink_width / 4)
+    total_width_at_minimum_ink_distance = total_ink_width - f.minimum_ink_distance(l, r)
+    left_translation = (-(np.ceil(total_width_at_minimum_ink_distance/2) + sample_distance_left) - (-ink_width_left))
+    right_translation = ((np.floor(total_width_at_minimum_ink_distance/2) + sample_distance_right) - ink_width_right)
+    return left_translation,right_translation
+
   def set_string(self, s, pair_distance_dict = {}):
     """Returns a matrix containing a representation of the given string. If a dictionary
     is passed to `pair_distance_dict`, then each pair name `(l,r)` will be looked up
