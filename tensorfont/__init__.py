@@ -124,13 +124,13 @@ class Font(object):
 
     (Inputs `l` and `r` are glyph names, not `GlyphRendering` objects.)
     """
-    sample_distance = dist + f.minimum_ink_distance(l,r)
+    sample_distance = dist + self.minimum_ink_distance(l,r)
     sample_distance_left = np.ceil(sample_distance / 2)
     sample_distance_right = np.floor(sample_distance / 2)
-    total_ink_width = f.glyph(l).ink_width + f.glyph(r).ink_width
+    total_ink_width = self.glyph(l).ink_width + self.glyph(r).ink_width
     ink_width_left = np.floor(total_ink_width / 4)
     ink_width_right = np.ceil(total_ink_width / 4)
-    total_width_at_minimum_ink_distance = total_ink_width - f.minimum_ink_distance(l, r)
+    total_width_at_minimum_ink_distance = total_ink_width - self.minimum_ink_distance(l, r)
     left_translation = (-(np.ceil(total_width_at_minimum_ink_distance/2) + sample_distance_left) - (-ink_width_left))
     right_translation = ((np.floor(total_width_at_minimum_ink_distance/2) + sample_distance_right) - ink_width_right)
     return left_translation,right_translation
