@@ -263,3 +263,36 @@ class GlyphRendering(np.ndarray):
     """Similar to `impose` but returns a pair of `GlyphRendering` objects separately, padded at the correct distance."""
     s2, o2 = self.with_padding(0, other.shape[1] + distance), other.with_padding(self.shape[1]+distance, 0)
     return s2, o2
+
+  def mask_ink_to_edge(self):
+    """Returns two `GlyphRendering` objects representing the left and right "edges" of the glyph:
+    the first has positive values in the space between the left-hand contour and the left edge of the matrix
+    and zero values elsewhere, and the second has positive values between the right-hand contour and
+    the right edge of the matrix and zero values elsewhere. In other words this gives you the
+    "white" at the edge of the glyph, without any interior counters."""
+    right
+    def last_nonzero(arr, axis, invalid_val=-1):
+        mask = arr > 5/255.0
+        val = arr.shape[axis] - np.flip(mask, axis=axis).argmax(axis=axis) - 1
+        return np.where(mask.any(axis=axis), val, invalid_val)
+
+    def first_zero(arr, axis, invalid_val=-1):
+        mask = arr < 5/255.0
+        val = mask.argmax(axis=axis) - 1
+        return np.where(mask.any(axis=axis), val, invalid_val)
+
+    def left_counter(image):
+        lcounter = 1 - image
+        lnonz = first_zero(lcounter,1)
+        for x in range(lnonz.shape[0]): lcounter[x,1+lnonz[x]:] = 0
+        lcounter -= np.min(lcounter)
+        for x in range(lnonz.shape[0]): lcounter[x,lnonz[x]:] = 0
+        return lcounter
+
+    def right_counter(image):
+        rcounter = np.flip(image,axis=1)
+        rcounter = left_counter(rcounter)
+        rcounter = np.flip(rcounter,axis=1)
+        return rcounter
+
+    return [GlyphRendering.init_from_numpy(self._glyph,x) for x in [left_counter(self), right_counter(self)]]
