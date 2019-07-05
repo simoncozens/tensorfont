@@ -111,6 +111,27 @@ each other (consider “nn” and “oo”). However, pairs like “VA” and �
 minimum ink distance.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="tensorfont.Font.shift_distances">
+<code class="descname">shift_distances</code><span class="sig-paren">(</span><em>l</em>, <em>r</em>, <em>dist</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font.shift_distances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns two distances, for which the left glyph matrix and the right glyph matrix
+should be translated such that, when the translations are done, the pair is set at a
+distance <cite>dist</cite> pixels apart.</p>
+<p>(Inputs <cite>l</cite> and <cite>r</cite> are glyph names, not <cite>GlyphRendering</cite> objects.)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.Font.set_string">
+<code class="descname">set_string</code><span class="sig-paren">(</span><em>s</em>, <em>pair_distance_dict={}</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font.set_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a matrix containing a representation of the given string. If a dictionary
+is passed to <cite>pair_distance_dict</cite>, then each pair name <cite>(l,r)</cite> will be looked up
+in the directionary and the result will be used as a distance <em>in pixel units</em> at
+which to set the pair. If no entry is found or no dictionary is passed, then the font
+will be queried for the appropriate distance.</p>
+<p>Hint: If you want to use glyph names which are not single characters, then pass an
+<em>array</em> of glyph names instead of a string.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -251,6 +272,16 @@ placed side by side at the given distance.</p>
 <dt id="tensorfont.GlyphRendering.set_at_distance">
 <code class="descname">set_at_distance</code><span class="sig-paren">(</span><em>other</em>, <em>distance=0</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.set_at_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Similar to <cite>impose</cite> but returns a pair of <cite>GlyphRendering</cite> objects separately, padded at the correct distance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.mask_ink_to_edge">
+<code class="descname">mask_ink_to_edge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.mask_ink_to_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns two <cite>GlyphRendering</cite> objects representing the left and right “edges” of the glyph:
+the first has positive values in the space between the left-hand contour and the left edge of the matrix
+and zero values elsewhere, and the second has positive values between the right-hand contour and
+the right edge of the matrix and zero values elsewhere. In other words this gives you the
+“white” at the edge of the glyph, without any interior counters.</p>
 </dd></dl>
 
 </dd></dl>
