@@ -117,6 +117,13 @@ class Font(object):
     left_of_r  = self.glyph(right).as_matrix().left_contour()
     return np.min(right_of_l + left_of_r)
 
+  def maximum_ink_distance(self,left,right):
+    """The maximum distance, in pixels, between the ink of the left glyph and the ink of the right glyph, when
+    sidebearings are discarded. In other words, the size of the "hole" in the glyph (LV has a large hole)."""
+    right_of_l = self.glyph(left).as_matrix().right_contour(max_depth=-1)
+    left_of_r  = self.glyph(right).as_matrix().left_contour(max_depth=-1)
+    return np.max(right_of_l + left_of_r)
+
   def shift_distances(self,l,r,dist):
     """Returns two distances, for which the left glyph matrix and the right glyph matrix
     should be translated such that, when the translations are done, the pair is set at a
@@ -218,17 +225,27 @@ class GlyphRendering(np.ndarray):
     s._glyph = glyph
     return s
 
+  def transform(self, func):
+    return GlyphRendering.init_from_numpy(self._glyph, func(self))
+
   def with_padding(self, left_padding, right_padding):
     """Returns a new `GlyphRendering` object, left and right zero-padding to the glyph image."""
     padding = ((0,0),(left_padding, right_padding))
-    padded = pad(self, padding, "constant")
-    return GlyphRendering.init_from_numpy(self._glyph, padded)
+    return self.transform(lambda x: pad(x, padding, "constant"))
 
   def with_padding_to_constant_box_width(self, box_width):
     padding_width = (box_width - self._glyph.ink_width) / 2.0
-    padding = ((0, 0), (int(np.ceil(padding_width)), int(np.floor(padding_width))))
-    padded = pad(self, padding, "constant")
-    return GlyphRendering.init_from_numpy(self._glyph, padded)
+    return self.with_padding(int(np.ceil(padding_width)), int(np.floor(padding_width)))
+
+  def with_padding_to_size(self,box_height,box_width):
+    padding_width = (box_width - self.shape[1]) / 2.0
+    padding_height = (box_height - self.shape[0])
+    padding_height_top = self._glyph.font.baseline_ratio * padding_height
+    padding_height_bottom = (1-self._glyph.font.baseline_ratio) * padding_height
+    padding = ((int(np.ceil(padding_height_top)), int(np.floor(padding_height_bottom))), (int(np.ceil(padding_width)), int(np.floor(padding_width))))
+    if np.any(np.array(padding) <0):
+      return None
+    return self.transform(lambda x: pad(x, padding, "constant"))
 
   def with_sidebearings(self):
     """Returns a new `GlyphRendering` object, extending the image to add the
