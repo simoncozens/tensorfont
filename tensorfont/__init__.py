@@ -39,14 +39,17 @@ class Font(object):
   Use this to load up a font and begin exploring it.
   """
 
-  def __init__(self, filename, x_height_in_px):
+  def __init__(self, filename, x_height_in_px=None):
     self.filename = filename
     self.face = freetype.Face(filename)
 
     # Set size by rendering /x and dividing by its height
-    self.face.set_pixel_sizes(0, self.face.units_per_EM) # render at 1 pixel per unit
-    x_height_at_em = self.get_xheight()
-    self.scale_factor = x_height_in_px / x_height_at_em
+    if x_height_in_px is None:
+      self.scale_factor = 1
+    else:
+      self.face.set_pixel_sizes(0, self.face.units_per_EM) # render at 1 pixel per unit
+      x_height_at_em = self.get_xheight()
+      self.scale_factor = x_height_in_px / x_height_at_em
     x_height_unit = int(self.face.units_per_EM * self.scale_factor)
     self.face.set_pixel_sizes(0, x_height_unit)
 
