@@ -263,7 +263,7 @@ class GlyphRendering(np.ndarray):
     will be trimmed appropriately."""
     lsb = self._glyph.lsb
     rsb = self._glyph.rsb
-    return matrix.with_padding(lsb,rsb)
+    return self.with_padding(lsb,rsb)
 
   def mask_to_x_height(self):
     """Returns a new `GlyphRendering` object, cropping the glyph image
