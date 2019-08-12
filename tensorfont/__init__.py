@@ -232,9 +232,16 @@ class GlyphRendering(np.ndarray):
     return GlyphRendering.init_from_numpy(self._glyph, func(self))
 
   def with_padding(self, left_padding, right_padding):
-    """Returns a new `GlyphRendering` object, left and right zero-padding to the glyph image."""
+    """Returns a new `GlyphRendering` object, left and right zero-padding to the glyph image. If the padding is negative, the matrix will be trimmed appropriately."""
+    matrix = self
+    if left_padding < 0:
+        matrix = GlyphRendering.init_from_numpy(self._glyph,self[:,-left_padding:])
+        left_padding = 0
+    if right_padding < 0:
+        matrix = GlyphRendering.init_from_numpy(self._glyph,self[:,:right_padding])
+        right_padding = 0
     padding = ((0,0),(left_padding, right_padding))
-    return self.transform(lambda x: pad(x, padding, "constant"))
+    return matrix.transform(lambda x: pad(x, padding, "constant"))
 
   def with_padding_to_constant_box_width(self, box_width):
     padding_width = (box_width - self._glyph.ink_width) / 2.0
@@ -256,13 +263,6 @@ class GlyphRendering(np.ndarray):
     will be trimmed appropriately."""
     lsb = self._glyph.lsb
     rsb = self._glyph.rsb
-    matrix = self
-    if lsb < 0:
-        matrix = GlyphRendering.init_from_numpy(self._glyph,self[:,-lsb:])
-        lsb = 0
-    if rsb < 0:
-        matrix = GlyphRendering.init_from_numpy(self._glyph,self[:,:rsb])
-        rsb = 0
     return matrix.with_padding(lsb,rsb)
 
   def mask_to_x_height(self):
