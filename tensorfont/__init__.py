@@ -7,8 +7,12 @@ from skimage.transform import resize
 from skimage.util import pad
 from skimage import filters
 
+from tensorfont.interpshape import interp_shape
 from scipy import ndimage
 import scipy
+
+from skimage.morphology import convex_hull_image
+from scipy.ndimage import distance_transform_edt, distance_transform_cdt
 
 from tensorfont.getKerningPairsFromOTF import OTFKernReader
 from functools import lru_cache
@@ -305,7 +309,7 @@ class GlyphRendering(np.ndarray):
 
   def apply_flexible_distance_kernel(self, strength):
     """Transforms the matrix by applying a flexible distance kernel, with given strength."""
-    transformed = 1. - np.clip(strength-ndimage.distance_transform_edt(np.logical_not(self)),0,strength)
+    transformed = 1. - np.clip(strength-distance_transform_edt(np.logical_not(self)),0,strength)
     return GlyphRendering.init_from_numpy(self._glyph,transformed)
 
   def gradients(self):
@@ -358,3 +362,10 @@ class GlyphRendering(np.ndarray):
         return rcounter
 
     return [GlyphRendering.init_from_numpy(self._glyph,x) for x in [left_counter(self), right_counter(self)]]
+
+  def reduce_concavity(self,percent):
+    """Smooths out concavities in glyphs like 'T', 'L', 'E' by interpolating between the
+    glyph and its convex hull. Assumes input is binarized. Typical value of `percent` is
+    order of 0.001."""
+    ch = convex_hull_image(self)
+    return GlyphRendering.init_from_numpy(self._glyph,interp_shape(self>0.5,ch>0.5,percent))
