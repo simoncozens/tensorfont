@@ -18,6 +18,8 @@ from tensorfont.getKerningPairsFromOTF import OTFKernReader
 from functools import lru_cache
 from itertools import tee
 
+from fontTools import ttLib
+
 safe_glyphs = set([
   "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m",
   "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
@@ -84,6 +86,12 @@ class Font(object):
     if g in self.glyphcache: return self.glyphcache[g]
     self.glyphcache[g] = Glyph(self,g)
     return self.glyphcache[g]
+
+  @property
+  def italic_angle(self):
+    """The italic angle of the font, in degrees."""
+    f = ttLib.TTFont(self.filename)
+    return -(f["post"].italicAngle)
 
   @property
   def m_width(self):
@@ -363,9 +371,56 @@ class GlyphRendering(np.ndarray):
 
     return [GlyphRendering.init_from_numpy(self._glyph,x) for x in [left_counter(self), right_counter(self)]]
 
+  def discontinuity(self, contour="left", tolerance = 0.05):
+    """Provides a measure, from zero to one, of the "jumpiness" or discontinuity of a
+    contour. By default it looks at the left contour; pass `contour="right"` to look
+    at the right. You can feed this value to `reduce_concavity`. The tolerance parameter
+    determines the size of "jumps" that are significance, measured in fractions of an em.
+    By default, anything less that 0.05em is considered smooth and continuous."""
+    if contour == "left":
+        c = self.left_contour(max_depth=-1)
+    else:
+        c = self.right_contour(max_depth=-1)
+    steps = c[1:] - c[:-1]
+    non_edges = ((c[:-1]!=-1) & (c[1:]!=-1))
+    jumps = np.abs(steps) > (self._glyph.font.m_width * tolerance)
+    total = np.abs(np.sum(steps * non_edges * jumps))
+    total2 = np.sum(np.abs(steps * non_edges * jumps))
+
+    return np.clip(total / self.shape[1],0,1)
+
+  def right_face(self, epsilon=0.2):
+    c = self.right_contour(max_depth=-1)
+    c = np.delete(c,np.where(c==-1))
+    pctile = np.min(c) + 0.2 * (np.max(c)-np.min(c))
+    return np.sum(c < pctile) / c.shape[0]
+
+  def left_face(self, epsilon=0.2):
+    c = self.left_contour(max_depth=-1)
+    c = np.delete(c,np.where(c==-1))
+    pctile = np.min(c) + 0.2 * (np.max(c)-np.min(c))
+    return np.sum(c < pctile) / c.shape[0]
+
   def reduce_concavity(self,percent):
     """Smooths out concavities in glyphs like 'T', 'L', 'E' by interpolating between the
-    glyph and its convex hull. Assumes input is binarized. Typical value of `percent` is
-    order of 0.001."""
-    ch = convex_hull_image(self)
-    return GlyphRendering.init_from_numpy(self._glyph,interp_shape(self>0.5,ch>0.5,percent))
+    glyph and its convex hull."""
+
+    ch = GlyphRendering.init_from_numpy(self,convex_hull_image(self))
+    r = self.left_contour(max_depth=-1)
+    rch = ch.left_contour(cutoff=0.1,max_depth=-1)
+    interpolated = (rch * (percent) + r * (1-percent)).astype(np.int32)
+    new = GlyphRendering.init_from_numpy(self,self.copy())
+    fill = np.max(new)
+    for line in range(0,len(interpolated)):
+        if interpolated[line] != -1:
+            new[line,interpolated[line]:r[line]+1] = fill
+
+    r = self.right_contour(max_depth=-1)
+    rch = ch.right_contour(cutoff=0.1,max_depth=-1)
+    width = self.shape[1]
+    interpolated = (rch * (percent) + r * (1-percent)).astype(np.int32)
+    for line in range(0,len(interpolated)):
+        if interpolated[line] != -1:
+            new[line,(width-r[line]+1):(width-interpolated[line])] = fill
+
+    return GlyphRendering.init_from_numpy(self._glyph,new)
