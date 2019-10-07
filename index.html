@@ -38,7 +38,7 @@
 </div>
 <span class="target" id="module-tensorfont"></span><dl class="class">
 <dt id="tensorfont.Font">
-<em class="property">class </em><code class="descclassname">tensorfont.</code><code class="descname">Font</code><span class="sig-paren">(</span><em>filename</em>, <em>x_height_in_px</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">tensorfont.</code><code class="descname">Font</code><span class="sig-paren">(</span><em>filename</em>, <em>x_height_in_px=None</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font" title="Permalink to this definition">¶</a></dt>
 <dd><p>The <cite>Font</cite> module is your entry point for using Tensorfont.
 Use this to load up a font and begin exploring it.</p>
 <dl class="attribute">
@@ -77,6 +77,12 @@ Use this to load up a font and begin exploring it.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="tensorfont.Font.italic_angle">
+<code class="descname">italic_angle</code><a class="headerlink" href="#tensorfont.Font.italic_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>The italic angle of the font, in degrees.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="tensorfont.Font.m_width">
 <code class="descname">m_width</code><a class="headerlink" href="#tensorfont.Font.m_width" title="Permalink to this definition">¶</a></dt>
 <dd><p>The width of the ‘m’ glyph, in font units.</p>
@@ -109,6 +115,13 @@ of the right glyph, plus a kerning correction. To turn off kerning, use <cite>wi
 sidebearings are discarded. For many pairs, this will be zero, as the shapes bump up against
 each other (consider “nn” and “oo”). However, pairs like “VA” and “xT” will have a large
 minimum ink distance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.Font.maximum_ink_distance">
+<code class="descname">maximum_ink_distance</code><span class="sig-paren">(</span><em>left</em>, <em>right</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.Font.maximum_ink_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum distance, in pixels, between the ink of the left glyph and the ink of the right glyph, when
+sidebearings are discarded. In other words, the size of the “hole” in the glyph (LV has a large hole).</p>
 </dd></dl>
 
 <dl class="method">
@@ -194,14 +207,24 @@ can be further manipulated.</p>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="tensorfont.GlyphRendering.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.transform" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
 <dt id="tensorfont.GlyphRendering.with_padding">
 <code class="descname">with_padding</code><span class="sig-paren">(</span><em>left_padding</em>, <em>right_padding</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.with_padding" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a new <cite>GlyphRendering</cite> object, left and right zero-padding to the glyph image.</p>
+<dd><p>Returns a new <cite>GlyphRendering</cite> object, left and right zero-padding to the glyph image. If the padding is negative, the matrix will be trimmed appropriately.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="tensorfont.GlyphRendering.with_padding_to_constant_box_width">
 <code class="descname">with_padding_to_constant_box_width</code><span class="sig-paren">(</span><em>box_width</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.with_padding_to_constant_box_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.with_padding_to_size">
+<code class="descname">with_padding_to_size</code><span class="sig-paren">(</span><em>box_height</em>, <em>box_width</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.with_padding_to_size" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -282,6 +305,33 @@ the first has positive values in the space between the left-hand contour and the
 and zero values elsewhere, and the second has positive values between the right-hand contour and
 the right edge of the matrix and zero values elsewhere. In other words this gives you the
 “white” at the edge of the glyph, without any interior counters.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.discontinuity">
+<code class="descname">discontinuity</code><span class="sig-paren">(</span><em>contour='left'</em>, <em>tolerance=0.05</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.discontinuity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides a measure, from zero to one, of the “jumpiness” or discontinuity of a
+contour. By default it looks at the left contour; pass <cite>contour=”right”</cite> to look
+at the right. You can feed this value to <cite>reduce_concavity</cite>. The tolerance parameter
+determines the size of “jumps” that are significance, measured in fractions of an em.
+By default, anything less that 0.05em is considered smooth and continuous.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.right_face">
+<code class="descname">right_face</code><span class="sig-paren">(</span><em>epsilon=0.2</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.right_face" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.left_face">
+<code class="descname">left_face</code><span class="sig-paren">(</span><em>epsilon=0.2</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.left_face" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tensorfont.GlyphRendering.reduce_concavity">
+<code class="descname">reduce_concavity</code><span class="sig-paren">(</span><em>percent</em><span class="sig-paren">)</span><a class="headerlink" href="#tensorfont.GlyphRendering.reduce_concavity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Smooths out concavities in glyphs like ‘T’, ‘L’, ‘E’ by interpolating between the
+glyph and its convex hull.</p>
 </dd></dl>
 
 </dd></dl>
