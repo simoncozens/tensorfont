@@ -2,6 +2,7 @@
 import numpy as np
 import math
 import freetype
+import uharfbuzz as hb
 
 from skimage.transform import resize
 from skimage.util import pad
@@ -14,7 +15,6 @@ import scipy
 from skimage.morphology import convex_hull_image
 from scipy.ndimage import distance_transform_edt, distance_transform_cdt
 
-from tensorfont.getKerningPairsFromOTF import OTFKernReader
 from functools import lru_cache
 from itertools import tee
 
@@ -74,8 +74,9 @@ class Font(object):
     self.baseline_ratio = 1 - (self.ascender) / self.full_height
     """The ascender-to-descender ratio."""
 
+    self.ttFont = ttLib.TTFont(self.filename)
+    self.hbFont = None
     self.glyphcache = {}
-    self.kernreader = None
 
   def get_xheight(self):
     self.face.load_char("x", freetype.FT_LOAD_RENDER | freetype.FT_LOAD_TARGET_MONO)
@@ -90,8 +91,7 @@ class Font(object):
   @property
   def italic_angle(self):
     """The italic angle of the font, in degrees."""
-    f = ttLib.TTFont(self.filename)
-    return -(f["post"].italicAngle)
+    return -(self.ttFont["post"].italicAngle)
 
   @property
   def m_width(self):
@@ -108,11 +108,26 @@ class Font(object):
     if self.face.has_kerning:
       return (self.face.get_kerning(left, right).x >> 6) * self.scale_factor
     else:
-      if not self.kernreader:
-         self.kernreader = OTFKernReader(self.filename)
-      if (left,right) in self.kernreader.kerningPairs:
-        return self.kernreader.kerningPairs[(left,right)] * self.scale_factor
-      return 0
+      if not self.hbFont:
+        with open(self.filename, "rb") as fontfile:
+          fontdata = fontfile.read()
+        face = hb.Face(fontdata)
+        font = hb.Font(face)
+        scale = face.upem * self.scale_factor
+        font.scale = (scale, scale)
+        self.hbFont = font
+
+      buf = hb.Buffer()
+      buf.add_str(left+right)
+      buf.guess_segment_properties()
+      hb.shape(self.hbFont, buf, {"kern":True})
+      pos = buf.glyph_positions[0].x_advance
+      buf = hb.Buffer()
+      buf.add_str(left+right)
+      buf.guess_segment_properties()
+      hb.shape(self.hbFont, buf, {"kern":False})
+      pos2 = buf.glyph_positions[0].x_advance
+      return pos-pos2
 
   def pair_distance(self, left, right, with_kerning=True):
     """The ink distance between two named glyphs, in font units.
@@ -190,7 +205,8 @@ class Glyph(object):
     self.name = g
     """The name of the glyph."""
 
-    self.face.load_char(g)
+    gid = self.font.ttFont.getGlyphID(g)
+    self.face.load_glyph(gid)
     slot = self.face.glyph
     self.ink_width = slot.bitmap.width
     self.ink_height= slot.bitmap.rows
@@ -212,7 +228,8 @@ class Glyph(object):
     appropriate keyword arguments. The matrix is returned as a `GlyphRendering` object which
     can be further manipulated."""
     box_height = self.font.full_height_px
-    self.face.load_char(self.name)
+    gid = self.font.ttFont.getGlyphID(self.name)
+    self.face.load_glyph(gid)
 
     slot = self.face.glyph
     bitmap = slot.bitmap
