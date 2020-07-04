@@ -13,6 +13,9 @@ Tensorfont - Turn font glyphs into numpy arrays
     :undoc-members:
 
 
+.. automodule:: tensorfont.dataset
+    :members:
+
 Indices and tables
 ==================
 

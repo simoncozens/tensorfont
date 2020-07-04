@@ -257,6 +257,10 @@ class GlyphRendering(np.ndarray):
     s._glyph = glyph
     return s
 
+  def normalize(self):
+    self /= self.max()
+    return self
+
   def transform(self, func):
     return GlyphRendering.init_from_numpy(self._glyph, func(self))
 
@@ -283,8 +287,24 @@ class GlyphRendering(np.ndarray):
     padding_height_bottom = (1-self._glyph.font.baseline_ratio) * padding_height
     padding = ((int(np.ceil(padding_height_top)), int(np.floor(padding_height_bottom))), (int(np.ceil(padding_width)), int(np.floor(padding_width))))
     if np.any(np.array(padding) <0):
+      print(padding)
       return None
     return self.transform(lambda x: pad(x, padding, "constant"))
+
+  def with_center_cropped_to_size(self, box_height, box_width):
+    def crop_center(img,cropx, cropy):
+        y,x = img.shape
+        if x > cropx:
+          startx = x//2-(cropx//2)
+          img = img[:,startx:startx+cropx]
+        if y > cropy:
+          starty = y//2-(cropy//2)
+          img = img[starty:starty+cropy, :]
+        return img
+    return self.transform(lambda x: crop_center(x, box_width, box_height))
+
+  def set_to_constant_size(self, box_height, box_width):
+    return self.with_center_cropped_to_size(box_height, box_width).with_padding_to_size(box_height, box_width)
 
   def with_sidebearings(self):
     """Returns a new `GlyphRendering` object, extending the image to add the
@@ -348,8 +368,9 @@ class GlyphRendering(np.ndarray):
       raise ValueError("heights don't match in impose")
     extension = distance + other.shape[1]
     extended = self.with_padding(0,extension)
+    maxofboth = min(np.max(self), np.max(other))
     extended[:,self.shape[1]+distance:self.shape[1]+extension] += other
-    return extended
+    return extended.transform(lambda x: np.clip(x, 0, maxofboth))
 
   def set_at_distance(self,other,distance=0):
     """Similar to `impose` but returns a pair of `GlyphRendering` objects separately, padded at the correct distance."""
