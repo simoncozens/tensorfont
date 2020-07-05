@@ -47,7 +47,7 @@ class RandomPair:
             if l in glyphs and r in glyphs:
                 yield (f, l, r)
 
-    def get_image(self, f, l, r, perturbation_range, kerning):
+    def get_image(self, f, l, r, perturbation_range=[0, 1], kerning=True):
         perturbation = random.randrange(*perturbation_range) * f.scale_factor
         pdd = {}
         pdd[(l, r)] = f.pair_distance(l, r, with_kerning=kerning) - perturbation
@@ -63,4 +63,5 @@ class RandomPair:
         while True:
             f, l, r = next(gen)
             img, perturbation = self.get_image(f, l, r, self.perturbation, self.kerned)
-            yield (img, perturbation)
+            if img.shape == (self.box_height, box_width):
+                yield (img, perturbation)
