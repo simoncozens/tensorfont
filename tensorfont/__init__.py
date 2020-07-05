@@ -377,6 +377,10 @@ class GlyphRendering(np.ndarray):
     s2, o2 = self.with_padding(0, other.shape[1] + distance), other.with_padding(self.shape[1]+distance, 0)
     return s2, o2
 
+  def rgb(self):
+    """Return a three-channel representation."""
+    return np.repeat(self[:,:,np.newaxis], 3, axis=2)
+
   def mask_ink_to_edge(self):
     """Returns two `GlyphRendering` objects representing the left and right "edges" of the glyph:
     the first has positive values in the space between the left-hand contour and the left edge of the matrix
