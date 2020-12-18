@@ -63,5 +63,5 @@ class RandomPair:
         while True:
             f, l, r = next(gen)
             img, perturbation = self.get_image(f, l, r, self.perturbation, self.kerned)
-            if img.shape == (self.box_height, box_width):
+            if img.shape == (self.box_height, self.box_width):
                 yield (img, perturbation)
