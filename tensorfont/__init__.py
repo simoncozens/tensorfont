@@ -5,7 +5,6 @@ import freetype
 import uharfbuzz as hb
 
 from skimage.transform import resize
-from skimage.util import pad
 from skimage import filters
 
 from tensorfont.interpshape import interp_shape
@@ -274,7 +273,7 @@ class GlyphRendering(np.ndarray):
         matrix = GlyphRendering.init_from_numpy(self._glyph,self[:,:right_padding])
         right_padding = 0
     padding = ((0,0),(left_padding, right_padding))
-    return matrix.transform(lambda x: pad(x, padding, "constant"))
+    return matrix.transform(lambda x: np.pad(x, padding, "constant"))
 
   def with_padding_to_constant_box_width(self, box_width):
     padding_width = (box_width - self._glyph.ink_width) / 2.0
@@ -289,7 +288,7 @@ class GlyphRendering(np.ndarray):
     if np.any(np.array(padding) <0):
       print(padding)
       return None
-    return self.transform(lambda x: pad(x, padding, "constant"))
+    return self.transform(lambda x: np.pad(x, padding, "constant"))
 
   def with_center_cropped_to_size(self, box_height, box_width):
     def crop_center(img,cropx, cropy):
