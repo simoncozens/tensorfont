@@ -241,7 +241,7 @@ class Glyph(object):
     visible_height = min(h, box_height - y) - max(-self.tsb, 0)
 
     Z = np.zeros((box_height, w))
-    Z[y:y+visible_height, 0:w] += np.array(bitmap.buffer, dtype='ubyte').reshape(h, w)[max(-self.tsb, 0):visible_height+max(-self.tsb, 0), :].astype(np.float)
+    Z[y:y+visible_height, 0:w] += np.array(bitmap.buffer, dtype='ubyte').reshape(h, w)[max(-self.tsb, 0):visible_height+max(-self.tsb, 0), :].astype(float)
     if normalize or binarize:
       Z = Z / 255.0
     if binarize:
