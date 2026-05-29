@@ -213,6 +213,20 @@ class Font(object):
 
         self.hbFont = None
         self.glyphcache = {}
+        with open(self.filename, "rb") as fontfile:
+            fontdata = fontfile.read()
+        face = hb.Face(fontdata)
+        self.hbFace = face
+        font = hb.Font(face)
+        scale = face.upem * self.scale_factor
+        font.set_variations(self.variations)
+        font.scale = (scale, scale)
+        self.hbFont = font
+        self.glyph_order = self.ttFont.getGlyphOrder()
+
+        self.glyphname_to_gid = {
+            self.glyph_order[i]: i for i in range(0, face.glyph_count)
+        }
 
     def get_xheight(self):
         self.face.load_char("x", freetype.FT_LOAD_RENDER | freetype.FT_LOAD_TARGET_MONO)
@@ -242,30 +256,34 @@ class Font(object):
 
     def pair_kerning(self, left, right):
         """The kerning between two glyphs (specified by name), in font units."""
-        if self.face.has_kerning:
-            return (self.face.get_kerning(left, right).x >> 6) * self.scale_factor
-        else:
-            if not self.hbFont:
-                with open(self.filename, "rb") as fontfile:
-                    fontdata = fontfile.read()
-                face = hb.Face(fontdata)
-                font = hb.Font(face)
-                scale = face.upem * self.scale_factor
-                font.set_variations(self.variations)
-                font.scale = (scale, scale)
-                self.hbFont = font
+        assert left in self.glyphname_to_gid, f"Glyph {left} not found in font"
+        assert right in self.glyphname_to_gid, f"Glyph {right} not found in font"
+        # We have to do tricks here to get a glyph-based buffer instead of a Unicode one
+        gid_left = self.glyphname_to_gid[left]
+        gid_right = self.glyphname_to_gid[right]
 
-            buf = hb.Buffer()
-            buf.add_str(left + right)
-            buf.guess_segment_properties()
-            hb.shape(self.hbFont, buf, {"kern": True})
-            pos = buf.glyph_positions[0].x_advance
-            buf = hb.Buffer()
-            buf.add_str(left + right)
-            buf.guess_segment_properties()
-            hb.shape(self.hbFont, buf, {"kern": False})
-            pos2 = buf.glyph_positions[0].x_advance
-            return pos - pos2
+        def nominal_glyph_func(font, code_point, data):
+            return code_point
+
+        funcs = hb.FontFuncs.create()
+        funcs.set_nominal_glyph_func(nominal_glyph_func)
+        hbfont_clone = hb.Font(self.hbFace)
+        scale = self.hbFace.upem * self.scale_factor
+        hbfont_clone.set_variations(self.variations)
+        hbfont_clone.scale = (scale, scale)
+        hbfont_clone.funcs = funcs
+
+        buf = hb.Buffer()
+        buf.add_str(chr(gid_left) + chr(gid_right))
+        buf.guess_segment_properties()
+        hb.shape(hbfont_clone, buf, {"kern": True})
+        pos = buf.glyph_positions[0].x_advance
+        buf = hb.Buffer()
+        buf.add_str(chr(gid_left) + chr(gid_right))
+        buf.guess_segment_properties()
+        hb.shape(hbfont_clone, buf, {"kern": False})
+        pos2 = buf.glyph_positions[0].x_advance
+        return pos - pos2
 
     def pair_distance(self, left, right, with_kerning=True):
         """The ink distance between two named glyphs, in font units.
